@@ -1,0 +1,26 @@
+add_rules("mode.debug", "mode.release")
+set_optimize("fastest")
+add_cxxflags("-shared -fPIC")
+add_syslinks("dl", "pthread")
+
+target("etp_modulesdk")
+    set_kind("static")
+    add_files("etp_sdk/modulesdk.c")
+
+target("deps")
+    set_kind("static")
+    add_files("addone.cpp")
+    add_files("cJSON.cpp")
+    add_files("connectClient.cpp")
+    add_files("handClient.cpp")
+    add_files("str.cpp")
+    add_files("log.cpp")
+    on_install(function (target)                         end)                                                 on_uninstall(function (target)                       end)
+
+target("etp_module_http")
+    set_kind("shared")
+    set_filename("etp_module_http.so")
+    add_deps("etp_modulesdk", "deps")
+    add_files("main.cpp")
+    add_files("init.cpp")
+
