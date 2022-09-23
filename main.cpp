@@ -8,7 +8,7 @@
 #include "ThreadInfo.h"
 #include "cJSON.h"
 #include "addone.h"
-#include "log.h"
+#include "etp_log/log.h"
 #include "etp_sdk/modulesdk.h"
 
 LinkLib *Linklib;
@@ -29,7 +29,7 @@ extern "C"
 		switch (initserver())
 		{
 		case -1:
-			printf("[%s] [ERROR] 初始化失败\n", gettime().time);
+			extrapidLog(LOG_ERROR, "HTTP", "初始化失败");
 			exit(1);
 		case 1:
 			initserver();
@@ -37,10 +37,6 @@ extern "C"
 		default:
 			break;
 		}
-		if (0 != InitSaveLog(LogPath))
-		{
-			printf("[%s] [WARNING] 日志无法正常记录，请检查目录%s\n", gettime().time, LogPath);
-		} //初始化日志记录
 		ModuleType_t mod = SDK_CreateModule("HTTP module", "This is a simple http server", 1);
 		SDK_AddBindPort(&mod, Port, handClient);
 		return mod;

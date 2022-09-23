@@ -7,7 +7,7 @@
 #include "define.h"
 #include "str.h"
 #include "addone.h"
-#include "log.h"
+#include "etp_log/log.h"
 
 /*
 errpr->0  正常
@@ -49,7 +49,7 @@ Gp GET(SOCKET clientsocket, char *buff, Res res)
 	p = strstr(buff, "GET /");
 	if (0 >= sscanf(p, "GET /%s", res.filename))
 	{
-		printf("[%s] [WORNING] 请求格式错误，无法解析\n",gettime().time);
+		extrapidLog(LOG_WARN, "HTTP", "请求格式错误，无法解析");
 		return r;
 	}
 	//单独判断是否是直接请求
@@ -235,7 +235,7 @@ Gp  POST(SOCKET clientsocket,char*buff,Res res)
 	p = strstr(buff, "POST /");
 	if (0 >= sscanf(p, "POST /%s", res.filename))
 	{
-		printf("[%s] [WORNING] 请求格式错误，无法解析\n",gettime().time);
+		extrapidLog(LOG_WARN, "HTTP", "请求格式错误，无法解析");
 		return r;
 	}
 
@@ -286,13 +286,8 @@ void pthreadexit(ThreadInfo *info)
 {
 	shutdown(info->connectInfo.client_socket, 2);
 	close(info->connectInfo.client_socket);
-	printf("[%s] [LOG] IP地址:%s,访问信息:%s,断开连接\n", gettime().time,info->connectInfo.address, info->connectInfo.filename);
+	extrapidLog(LOG_INFO, "HTTP", "IP地址:%s,访问信息:%s,断开连接", info->connectInfo.address, info->connectInfo.filename);
 	char *p=(char*)malloc(4500);
-	snprintf(p,4500,"[%s] [%s] \"%s\"",gettime().time,info->connectInfo.address,info->connectInfo.filename);
-	if (saveLog(p)!=0)
-	{
-		printf("[%s] [WARNING] 日志:%s无法记录\n",gettime().time,p);
-	}
 	free(p);
 	free(info);
 }
@@ -306,7 +301,7 @@ void handClient(int sock,struct sockaddr addr)
 	SOCKET clientsocket = (myinfo->connectInfo.client_socket);
 	Res res;
 	strcpy(res.address, myinfo->connectInfo.address);
-	printf("[%s] [LOG] 一个连接地址是:%s\n",gettime().time, myinfo->connectInfo.address);
+	extrapidLog(LOG_INFO, "HTTP", "一个连接地址是:%s", myinfo->connectInfo.address);
 	//strcpy("",);
 	char *buff = (char *)malloc(MAXSIZE);
 	int rcvcount = recv(clientsocket, buff, MAXSIZE, 0);
@@ -347,7 +342,7 @@ void handClient(int sock,struct sockaddr addr)
 						i = fread(temp, 1, 1024, p.fp);
 						if (i != 1024)
 						{
-							printf("[%s] [WORNING] 错误:正在从文件请求1024字节数据，但只能从文件读取到%lu字节\n",gettime().time, i);
+							extrapidLog(LOG_ERROR, "HTTP", "正在从文件请求1024字节数据，但只能从文件读取到%lu字节", i);
 						}
 					}
 					else
@@ -355,13 +350,13 @@ void handClient(int sock,struct sockaddr addr)
 						i = fread(temp, 1, p.readsize, p.fp);
 						if (i != p.readsize)
 						{
-							printf("[%s] [WORNING] 错误:正在从文件请求%lu字节数据，但只能从文件读取到%lu字节\n",gettime().time, p.readsize, i);
+							extrapidLog(LOG_ERROR, "HTTP", "正在从文件请求%lu字节数据，但只能从文件读取到%lu字节", p.readsize, i);
 						}
 					}
 					if (0 > send(clientsocket, temp, i, MSG_NOSIGNAL))
 					{
 						//break;//连接错误
-						printf("[%s] [WORNING] 一个连接因为异常原因断开\n",gettime().time);
+						extrapidLog(LOG_ERROR, "HTTP", "一个连接因为异常原因断开\n");
 						break;
 					}
 					p.readsize -= i;
@@ -397,7 +392,7 @@ void handClient(int sock,struct sockaddr addr)
 						i = fread(temp, 1, 1024, p.fp);
 						if (i != 1024)
 						{
-							printf("[%s] [WORNING] 错误:正在从文件请求1024字节数据，但只能从文件读取到%lu字节\n",gettime().time, i);
+							extrapidLog(LOG_ERROR, "HTTP", "正在从文件请求1024字节数据，但只能从文件读取到%lu字节", i);
 						}
 					}
 					else
@@ -405,13 +400,13 @@ void handClient(int sock,struct sockaddr addr)
 						i = fread(temp, 1, p.readsize, p.fp);
 						if (i != p.readsize)
 						{
-							printf("[%s] [WORNING] 错误:正在从文件请求%lu字节数据，但只能从文件读取到%lu字节\n",gettime().time, p.readsize, i);
+							extrapidLog(LOG_ERROR, "HTTP", "正在从文件请求%lu字节数据，但只能从文件读取到%lu字节", p.readsize, i);
 						}
 					}
 					if (0 > send(clientsocket, temp, i, MSG_NOSIGNAL))
 					{
 						//break;//连接错误
-						printf("[%s] [WORNING] 一个连接因为异常原因断开\n",gettime().time);
+						extrapidLog(LOG_ERROR, "HTTP", "一个连接因为异常原因断开");
 						break;
 					}
 					p.readsize -= i;
