@@ -1,6 +1,6 @@
-CFF= -c  -O -fPIC -I etp_log -std=c99
+CFF= -c  -O -fPIC -I etp_log
 etp_module_http.so:sdk.o main.o handClient.o connectClient.o init.o cJSON.o str.o addone.o log.o
-	g++ -std=c99 sdk.o main.o handClient.o cJSON.o connectClient.o init.o str.o log.o addone.o -ldl -lpthread -lm  -fPIC  -shared -o etp_module_http.so
+	g++ sdk.o main.o handClient.o cJSON.o connectClient.o init.o str.o log.o addone.o -ldl -lpthread -lm  -fPIC  -shared -o etp_module_http.so
 
 main.o:main.cpp ThreadInfo.h cJSON.h addone.h etp_log/log.h
 	g++ $(CFF)  main.cpp -o main.o
