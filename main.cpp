@@ -37,6 +37,7 @@ extern "C"
 		default:
 			break;
 		}
+		logInit(LogPath);
 		ModuleType_t mod = SDK_CreateModule("HTTP module", "This is a simple http server", 1);
 		SDK_AddBindPort(&mod, Port, handClient);
 		return mod;

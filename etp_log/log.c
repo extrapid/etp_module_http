@@ -4,33 +4,37 @@
 #include <unistd.h>
 char *logPath;
 char buf[1024];
-
+int inited = 0;
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 static const char *levelColors[] = {"\033[94m", "\033[36m", "\033[32m", "\033[33m", "\033[31m", "\033[35m", "\033[35m"};
 
 static const char *levelStrings[] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
 
-int mkdirs(const char * path, const mode_t mode, const int fail_on_exist)
+int mkdirs(const char *path, const mode_t mode, const int fail_on_exist)
 {
     int result = 0;
-    char * dir = NULL;
+    char *dir;
 
-    do {
+    do
+    {
         if (NULL == path)
         {
             errno = EINVAL;
             result = -1;
             break;
         }
-
-        if ((dir = strrchr(path, '/'))) 
+        char *s_path=(char*)malloc(strlen(path)+1);
+        strcpy(s_path, path);
+        free(s_path);
+        if ((dir = strrchr(s_path, '/')))
         {
             *dir = '\0';
             result = mkdirs(path, mode, fail_on_exist);
             *dir = '/';
 
-            if (result) break;
+            if (result)
+                break;
         }
 
         if (strlen(path))
@@ -62,6 +66,7 @@ void logInit(const char *setLogPath)
     }
 
     extrapidLog(LOG_INFO, "libLog", "Init libLog");
+    inited = 1;
 }
 
 void extrapidLog(const int logLevel, const char *moduleName, const char *fmt, ...)
@@ -90,13 +95,15 @@ void extrapidLog(const int logLevel, const char *moduleName, const char *fmt, ..
 
     printf("%s%s\n", logTimeLevelLib, buf);
 
-    FILE *fp;
-    char fileName[1024];
-    sprintf(fileName, "%s/%d-%d-%d.log", logPath, 1900 + nowTime->tm_year, 1 + nowTime->tm_mon, nowTime->tm_mday);
-    if ((fp = fopen(fileName, "a")) == NULL)
-        printf("%s%s\n", logTimeLevelLib, strerror(errno));
-    fprintf(fp, "%s%s\n", logToFile, buf);
-    fclose(fp);
-
+    if (inited == 1)
+    {
+        FILE *fp;
+        char fileName[1024];
+        sprintf(fileName, "%s/%d-%d-%d.log", logPath, 1900 + nowTime->tm_year, 1 + nowTime->tm_mon, nowTime->tm_mday);
+        if ((fp = fopen(fileName, "a")) == NULL)
+            printf("%s%s\n", logTimeLevelLib, strerror(errno));
+        fprintf(fp, "%s%s\n", logToFile, buf);
+        fclose(fp);
+    }
     pthread_mutex_unlock(&lock);
 }
