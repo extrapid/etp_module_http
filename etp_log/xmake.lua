@@ -1,7 +1,7 @@
 add_rules("mode.debug", "mode.release")
 set_optimize("fastest")
 
-target("log")
+target("etp_static_log")
     set_kind("static")
-    add_files("log.c")
+    add_files("log.cpp")
 
