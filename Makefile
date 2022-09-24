@@ -21,12 +21,12 @@ addone.o:addone.h define.h str.h addone.cpp
 str.o:str.h define.h str.cpp
 	g++ $(CFF) str.cpp -o str.o
 
-log.o:etp_log/log.h etp_log/log.c
-	g++ $(CFF) etp_log/log.c -o log.o
+log.o:etp_log/log.h etp_log/log.cpp
+	g++ $(CFF) etp_log/log.cpp -o log.o
 cJSON.o:cJSON.cpp cJSON.h
 	g++ $(CFF) cJSON.cpp -o cJSON.o 
-sdk.o:etp_sdk/modulesdk.c etp_sdk/modulesdk.h etp_sdk/moduletype.h
-	g++ $(CFF) etp_sdk/modulesdk.c -o sdk.o
+sdk.o:etp_sdk/modulesdk.cpp etp_sdk/modulesdk.h etp_sdk/moduletype.h
+	g++ $(CFF) etp_sdk/modulesdk.cpp -o sdk.o
 
 clean:
 	rm *.o
